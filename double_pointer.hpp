@@ -13,7 +13,7 @@ void doublePointerMinRight(
 	function<void(int, int)> update) {
 	int r = left;
 	for(int l = left; l < right; l++) {
-		while(r < right && check()) {
+		while(r < right && !check()) {
 			add(r++, false);
 		}
 		if(!check()) break;

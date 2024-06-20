@@ -124,6 +124,10 @@ public:
 		return lower_bound_rank(val + 1);
 	}
 
+	int range_freq(T l, T r) {
+		return lower_bound_rank(r) - lower_bound_rank(l);
+	}
+
 	/// @brief k番目に小さい要素を求める
 	/// @param k 求める要素の順位(0-indexed)
 	/// @param cur (ノード番号)

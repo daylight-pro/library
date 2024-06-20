@@ -56,6 +56,7 @@ public:
 	/// @param x2 右下のx座標
 	/// @return 長方形領域の和
 	T sum(int y1, int x1, int y2, int x2) {
+		if(y1 > y2 || x1 > x2)return T(0);
 		T ret = V[y2][x2];
 		if(y1 != 0) ret -= V[y1 - 1][x2];
 		if(x1 != 0) ret -= V[y2][x1 - 1];

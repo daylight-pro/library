@@ -4,7 +4,7 @@
 /// @param s 始点
 /// @param G グラフ
 /// @return ret[i]:sからiへの最短経路長
-vll dijkstra(int s, Graph<ll>& G) {
+vll dijkstra(int s, const Graph<ll>& G) {
 	using P = pair<ll, int>;
 	priority_queue<P, vector<P>, greater<>> que;
 	vll D(SZ(G), LINF);

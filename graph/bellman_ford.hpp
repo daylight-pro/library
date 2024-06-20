@@ -6,7 +6,8 @@
 /// @param s 始点
 /// @param D out:最短経路長が入る配列
 /// @return 負閉路を含むかどうか
-bool shortest_path(int V, Edges<ll>& EG, int s, vll& D) {
+bool shortest_path(int V, const Edges<ll>& EG, int s,
+				   vll& D) {
 	D = vll(V, LINF);
 	D[s] = 0;
 	int cnt = 0;

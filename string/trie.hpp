@@ -38,15 +38,18 @@ struct Trie {
 	/// @param word 検索する単語
 	/// @param prefix 検索をprefixで行うかどうか
 	/// @return 見つかったらtrue
-	bool search(const string& word, bool prefix = false) {
+	int search(const string& word, bool prefix = false) {
 		int cur = 0;
 		REP(i, SZ(word)) {
 			cur = nodes[cur].next[word[i] - base];
 			if(cur == -1) {
-				return false;
+				return 0;
 			}
 		}
-		return prefix || nodes[cur].num > 0;
+		if(prefix)
+			return nodes[cur].common;
+		else
+			return nodes[cur].num;
 	}
 	/// @brief wordに沿って、Trie木をdfsする。
 	/// @param word 進行方向を表す単語

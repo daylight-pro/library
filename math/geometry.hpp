@@ -139,3 +139,125 @@ vector<Point> convex_hull(vector<Point> &P) {
 	}
 	return ret;
 }
+
+/// @brief 2つのベクトルの内積を求める
+/// @tparam T 点の座標の型(2乗しても収まる型,整数対応)
+/// @param a 1つ目のベクトル
+/// @param b 2つ目のベクトル
+/// @return a.bの符号付き大きさ
+template<typename T>
+T dot(pair<T, T> a, pair<T, T> b) {
+	auto [ax, ay] = a;
+	auto [bx, by] = b;
+	return ax * bx + ay * by;
+}
+
+/// @brief 2つのベクトルの外積の大きさを求める
+/// @tparam T 点の座標の型(2乗しても収まる型,整数対応)
+/// @param a 1つ目のベクトル
+/// @param b 2つ目のベクトル
+/// @return a×bの符号付き大きさ
+template<typename T>
+T cross(pair<T, T> a, pair<T, T> b) {
+	auto [ax, ay] = a;
+	auto [bx, by] = b;
+	return ax * by - ay * bx;
+}
+/// @brief 点が,多角形上の内部,外部,周上のどれにあるかを判定する
+/// @tparam T 点の座標の型(2乗しても収まる型,整数対応)
+/// @param convex 多角形の座標を時計回りまたは反時計回りに格納した配列
+/// @param point クエリの点
+/// @return -1:OUT,0:ON,1:IN
+template<typename T>
+int polygon_contain(const vector<pair<T, T>> &polygon,
+					const pair<T, T> &point) {
+	int N = SZ(polygon);
+	bool x = false;
+	REP(i, N) {
+		auto [ax, ay] = polygon[i];
+		auto [bx, by] = polygon[(i + 1) % N];
+		ax -= point.first;
+		ay -= point.second;
+		bx -= point.first;
+		by -= point.second;
+		pair<T, T> a { ax, ay }, b { bx, by };
+		if(cross(a, b) == 0 && dot(a, b) <= 0) {
+			return 0;
+		}
+		if(a.second > b.second) swap(a, b);
+		if(a.second <= 0 && 0 < b.second && cross(a, b) > 0)
+			x = !x;
+	}
+	return (x ? 1 : -1);
+}
+/// @brief それぞれの点が,凸多角形上の内部,外部,周上のどれにあるかを判定する
+/// @tparam T 点の座標の型
+/// @param convex 凸多角形の座標を時計回りまたは反時計回りに格納した配列
+/// @param points クエリの点の配列
+/// @return -1:外部,0:周上,1:内部
+template<typename T>
+vi convex_contains(vector<pair<T, T>> &convex,
+				   vector<pair<T, T>> &points) {
+	using P = pair<T, int>;
+	vector<pair<T, int>> I(Q);
+	REP(i, Q) {
+		I[i] = { points[i].first, i };
+	}
+	so(I);
+
+	vvi L(Q);
+	REP(i, N) {
+		auto [x, y] = convex[i];
+		auto [xx, yy] = convex[(i + 1) % N];
+		if(x > xx) {
+			swap(x, xx);
+			swap(y, yy);
+		}
+		int l = distance(I.begin(),
+						 lower_bound(ALL(I), P { x, -1 }));
+		int r = distance(
+			I.begin(),
+			lower_bound(ALL(I), P { xx + 1, -1 }));
+		FOR(j, l, r) {
+			L[j].push_back(i);
+		}
+	}
+	vi ans(Q, 2);
+	REP(i, Q) {
+		auto [_, ind] = I[i];
+		auto [x, y] = points[ind];
+		bool high = false;
+		bool low = false;
+		for(auto l: L[i]) {
+			auto [a, b] = convex[l];
+			auto [c, d] = convex[(l + 1) % N];
+			if(a < c) {
+				swap(a, c);
+				swap(b, d);
+			}
+			if(a == c) {
+				if(min(b, d) <= y && y <= max(b, d)) {
+					ans[ind] = 0;
+				}
+			} else {
+				T left = (a - c) * y;
+				T right = (b - d) * (x - a) + b * (a - c);
+				if(left == right) {
+					ans[ind] = 0;
+				} else if(left > right) {
+					high = true;
+				} else {
+					low = true;
+				}
+			}
+		}
+		if(ans[ind] == 2) {
+			if(high && low) {
+				ans[ind] = 1;
+			} else {
+				ans[ind] = -1;
+			}
+		}
+	}
+	return ans;
+}
